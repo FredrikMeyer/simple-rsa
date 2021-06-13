@@ -1,18 +1,9 @@
-import random
 from typing import List, Tuple
 from dataclasses import dataclass
-
+from math import gcd
 
 p = 1091
 q = 1103
-
-
-def gcd(x: int, y: int) -> int:
-    while y != 0:
-        t = y
-        y = x % y
-        x = t
-    return x
 
 def modular_inverse(a: int, modulus: int) -> int:
     t, new_t = (0, 1)
@@ -49,7 +40,7 @@ def create_keypair() -> Tuple[PublicKey, PrivateKey]:
     while gcd(d, (p-1)*(q-1)) != 1:
         d += 1
 
-    e = modular_inverse(d, n)
+    e = modular_inverse(d, (p-1)*(q-1))
 
     return (PublicKey(exponent=e, modulus=n), PrivateKey(d=d, modulus=n))
 
@@ -58,13 +49,7 @@ def encrypt(message: int, public_key: PublicKey) -> int:
     return pow(message, public_key.exponent, public_key.modulus)
 
 def decrypt(message: int, private_key: PrivateKey) -> int:
-    return pow(message, private_key.d, private_key.modulus)
-
-
-# def modular_inverse(a: int, m: int, phi_m: int) -> int:
-#     ## a^-1 = a^phi_m-2 mod m
-
-#     return pow(a, phi_m - 1, m)
+    return pow(message, private_key.d, mod=private_key.modulus)
 
 class SignedMessage:
     message: str
